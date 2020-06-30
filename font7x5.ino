@@ -829,7 +829,7 @@ char LoadColumnBuffer(char ascii)
 #if defined(ESP8266)
 		int offset = font7x5_offset[ascii - 0x20];
 #else
-		int offset = pgm_read_word_near(font7x5_offset + (ascii-0x20));
+		int offset = pgm_read_word_near(font7x5_offset + (ascii - 0x20));
 #endif
 
 #if defined(ESP8266)
@@ -867,17 +867,8 @@ int ReloadMessage(int Pos, const char *message)
 int LoadMessage(const char *message)
 {
 	ResetColumnBuffer();
-	for (int counter = 0; ; counter++)
-	{
-		// read back a char 
-		unsigned char myChar = message[counter];
-		if (myChar != 0)
-		{
-			LoadColumnBuffer(myChar);
-		}
-		else break;
-	}
-	return LoadPos;
+
+	return ReloadMessage(LoadPos, message);
 }
 
 int ScrollPos;
@@ -919,4 +910,3 @@ int LoadDisplayBuffer(int BufferLen)
 
 	return ScrollPos;
 }
-
