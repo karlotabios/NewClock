@@ -1,6 +1,6 @@
 # NewClock
 
-Adruino Project using NodeMCU 1.0 (ESP8266) and DS3231
+Adruino Project using NodeMCU 1.0 (ESP8266), DS3231, and MAX7219
 
 # About
 
