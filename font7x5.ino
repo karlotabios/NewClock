@@ -826,6 +826,7 @@ char LoadColumnBuffer(char ascii)
 	if (ascii >= 0x20 && ascii <= 0x7f)
 	{
 		kern = pgm_read_byte_near(font7x5_kern + (ascii - 0x20));
+    kern--;
 #if defined(ESP8266)
 		int offset = font7x5_offset[ascii - 0x20];
 #else
@@ -905,8 +906,8 @@ int LoadDisplayBuffer(int BufferLen)
 		mask <<= 1;
 		lc.setRow(row, RowBuffer);
 	}
-	ScrollPos++;
-	if (ScrollPos >= BufferLen) ScrollPos = 0;
+	// if (ScrollPos < BufferLen) ScrollPos++;
+	// if (ScrollPos >= BufferLen) ScrollPos = 0;
 
 	return ScrollPos;
 }

@@ -51,8 +51,11 @@ const int SPI_CS = 15;
 const int SPI_MOSI = 13;
 const int SPI_CLK = 14;
 
-char scrollText[] = "00:00:00am \0";
-//                   01234567890
+// char scrollText[] = "00:00:00am\0";
+//                      01234567890
+
+char scrollText[] = "00:00\0";
+//                   012340
 
 extern int LoadPos;
 
@@ -162,23 +165,23 @@ void loop(void) {
   if (LoadDisplayBuffer(BufferEnd) == 0) {
     if (LogoOn())
     {
-      LogoCount++;
-      if (LogoCount > 5) {
-        LogoCount = 0;
-        SetLogo(false);
-        String Timestr(scrollText);
-        Timestr += GetDateStr();
-        BufferEnd = LoadMessage(Timestr.c_str());
-      } else
-      if (LogoCount == 3) {
-        SetLogo(false);
-        LoadDisplayBMP280();
-        String Timestr(scrollText);
-        Timestr += bmp280_str;
-        BufferEnd = LoadMessage(Timestr.c_str());
-      } else {
-        BufferEnd = LoadMessage(scrollText);
-      }
+      // LogoCount++;
+      // if (LogoCount > 5) {
+      //   LogoCount = 0;
+      //   SetLogo(false);
+      //   String Timestr(scrollText);
+      //   Timestr += GetDateStr();
+      //   BufferEnd = LoadMessage(Timestr.c_str());
+      // } else
+      // if (LogoCount == 3) {
+      //   SetLogo(false);
+      //   LoadDisplayBMP280();
+      //   String Timestr(scrollText);
+      //   Timestr += bmp280_str;
+      //   BufferEnd = LoadMessage(Timestr.c_str());
+      // } else {
+      //   BufferEnd = LoadMessage(scrollText);
+      // }
     }
     else
     {
@@ -216,6 +219,13 @@ String GetDateStr(void)
   return DateStr;
 }
 
+
+// bSecondSwitch represents a switch that toggles between true and false every time a second passes
+bool bSecondSwitch = false;
+
+// previousTimeSeconds represent the time in seconds previously recorded
+int previousTimeSeconds = 0;
+
 void UpdateTime(void)
 {
   time_t tm = now();
@@ -239,19 +249,38 @@ void UpdateTime(void)
 
   int sec = second(tm);
   int sec10 = sec / 10;
-  scrollText[6] = '0' + sec10;
-  scrollText[7] = '0' + sec - (sec10 * 10);
 
-  if (isAM(tm))
+  if (previousTimeSeconds != sec)
   {
-    scrollText[8] = 'a';
-    scrollText[9] = 'm';
+    previousTimeSeconds = sec;
+    bSecondSwitch = !bSecondSwitch;
+  }
+
+  if (bSecondSwitch)
+  {
+    scrollText[2] = ' ';
   }
   else
   {
-    scrollText[8] = 'p';
-    scrollText[9] = 'm';
+    scrollText[2] = ':';
   }
+  
+
+  // int sec = second(tm);
+  // int sec10 = sec / 10;
+  // scrollText[6] = '0' + sec10;
+  // scrollText[7] = '0' + sec - (sec10 * 10);
+
+  // if (isAM(tm))
+  // {
+  //   scrollText[8] = 'a';
+  //   scrollText[9] = 'm';
+  // }
+  // else
+  // {
+  //   scrollText[8] = 'p';
+  //   scrollText[9] = 'm';
+  // }
 }
 
 const int timeZone = 8 * SECS_PER_HOUR;     // PHT
