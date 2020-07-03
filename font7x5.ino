@@ -905,8 +905,8 @@ int LoadDisplayBuffer(int BufferLen)
 		mask <<= 1;
 		lc.setRow(row, RowBuffer);
 	}
-	ScrollPos++;
-	if (ScrollPos >= BufferLen) ScrollPos = 0;
+	// ScrollPos++;
+	// if (ScrollPos >= BufferLen) ScrollPos = 0;
 
 	return ScrollPos;
 }
