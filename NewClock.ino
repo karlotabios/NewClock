@@ -51,8 +51,11 @@ const int SPI_CS = 15;
 const int SPI_MOSI = 13;
 const int SPI_CLK = 14;
 
-char scrollText[] = "00:00:00am \0";
-//                   01234567890
+char scrollText[] = "00:00am\0";
+//                   01234567
+
+// char scrollText[] = "00:00:00am \0";
+// //                   01234567890
 
 extern int LoadPos;
 
@@ -223,7 +226,7 @@ void UpdateTime(void)
   int hour = hourFormat12(tm);
   if (hour < 10)
   {
-    scrollText[0] = ' ';
+    scrollText[0] = '0';
     scrollText[1] = '0' + hour;
   }
   else
@@ -237,20 +240,20 @@ void UpdateTime(void)
   scrollText[3] = '0' + min10;
   scrollText[4] = '0' + min - (min10 * 10);
 
-  int sec = second(tm);
-  int sec10 = sec / 10;
-  scrollText[6] = '0' + sec10;
-  scrollText[7] = '0' + sec - (sec10 * 10);
+  // int sec = second(tm);
+  // int sec10 = sec / 10;
+  // scrollText[6] = '0' + sec10;
+  // scrollText[7] = '0' + sec - (sec10 * 10);
 
   if (isAM(tm))
   {
-    scrollText[8] = 'a';
-    scrollText[9] = 'm';
+    scrollText[5] = 'a';
+    scrollText[6] = 'm';
   }
   else
   {
-    scrollText[8] = 'p';
-    scrollText[9] = 'm';
+    scrollText[5] = 'p';
+    scrollText[6] = 'm';
   }
 }
 
