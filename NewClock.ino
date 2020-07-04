@@ -165,7 +165,7 @@ void loop(void) {
   if (LoadDisplayBuffer(BufferEnd) == 0) {
     if (LogoOn())
     {
-      LogoCount++;
+      // LogoCount++;
       if (LogoCount > 5) {
         LogoCount = 0;
         SetLogo(false);
