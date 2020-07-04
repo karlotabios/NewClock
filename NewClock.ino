@@ -153,9 +153,6 @@ void setup(void) {
 	webserver_setup();
 }
 
-char TimeText[] = "00:00:00am\0";
-//                 01234567890
-
 int LogoCount = 0;
 int BufferEnd = 0;
 
