@@ -47,6 +47,7 @@ const char *ap_password = "bst142857";
 ///////////////////////////////////////////////////////////////////
 
 const int numDevices = 8;      // number of MAX7219s used
+const int contiguousDeviceLength = 4    // how long each sequence of MAX7219 devices is
 const int SPI_CS = 15;
 const int SPI_MOSI = 13;
 const int SPI_CLK = 14;
@@ -64,6 +65,7 @@ void UpdateTime(void);
 int LoadMessage(const char *message);
 void ResetScrollPos(void);
 int LoadDisplayBuffer(int BufferLen, bool bIsScrolling);
+int LoadDisplayBufferDeviceRow(int BufferLen, bool bIsScrolling, int deviceRow);
 void sendNTPpacket(IPAddress& address);
 
 void LoadDisplayBMP280(void);

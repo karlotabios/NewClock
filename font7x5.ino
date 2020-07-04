@@ -881,7 +881,43 @@ void ResetScrollPos(void)
 
 int LoadDisplayBuffer(int BufferLen, bool bIsScrolling = true)
 {
+	return LoadDisplayBufferDeviceRow(BufferLen, bIsScrolling, 0);
+}
+
+int LoadDisplayBufferDeviceRow(int BufferLen, bool bIsScrolling = true, int deviceRow = 0)
+{
 	unsigned char mask = 0x01;
+
+	bool bIsDeviceSpecific = false; // determines if each contiguous row of MAX7219 will have a seperate message or usage
+	int deviceRowLimit = 0; // number that will determine the specific range of contiguous devices that will display the message
+
+	if (deviceRow != 0) // if deviceRow is 0, all devices will be used to display the range; deviceRow = 1 refers to the first row, deviceRow = 2 refers to the second, etc.
+	{
+		bIsDeviceSpecific = true;
+	}
+	
+	if (bIsDeviceSpecific)
+	{
+		// example:  8 = 4 * 2
+		// 4 = 4 * 1
+		deviceRowLimit = contiguousDeviceLength * deviceRow;
+
+		if (deviceRowLimit > numDevices)
+		{
+			deviceRowLimit = numDevices;
+		}
+
+		// decrement to match the index
+		deviceRowLimit--;
+	}
+	
+	// deviceRowLimit is the upper bound, while deviceRowLowerBound is the lower bound
+	int deviceRowLowerBound = deviceRowLimit - contiguousDeviceLength;
+
+	if (deviceRowLowerBound < 0)
+	{
+		deviceRowLowerBound = 0;
+	}
 
 	for (int row = 0; row < 8; row++)
 	{
@@ -891,6 +927,14 @@ int LoadDisplayBuffer(int BufferLen, bool bIsScrolling = true)
 
 		for (int device = numDevices - 1; device >= 0; device--)
 		{
+			if (bIsDeviceSpecific)
+			{
+				if ((device > deviceRowLimit) || (device <= deviceRowLowerBound))
+				{
+					continue;
+				}
+			}
+
 			unsigned char dat = 0;
 			for (int col = 0; col < 8; col++)
 			{
