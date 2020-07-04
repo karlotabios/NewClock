@@ -52,7 +52,7 @@ const int SPI_CS = 15;
 const int SPI_MOSI = 13;
 const int SPI_CLK = 14;
 
-char scrollText[] = "00:00\0";
+char scrollText[] = "00:00 \0";
 //                   012345
 
 // char scrollText[] = "00:00:00am \0";
@@ -161,7 +161,7 @@ int BufferEnd = 0;
 void loop(void) {
 	UpdateTime();
 
-  if (LoadDisplayBuffer(BufferEnd, true) == 0) {
+  if (LoadDisplayBufferDeviceRow(BufferEnd, true, 0) == 0) {
     if (LogoOn())
     {
       // LogoCount++;
@@ -225,7 +225,7 @@ void UpdateTime(void)
   int hour = hourFormat12(tm);
   if (hour < 10)
   {
-    scrollText[0] = '0';
+    scrollText[0] = ' ';
     scrollText[1] = '0' + hour;
   }
   else
