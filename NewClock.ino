@@ -63,7 +63,7 @@ void InitMax7219();
 void UpdateTime(void);
 int LoadMessage(const char *message);
 void ResetScrollPos(void);
-int LoadDisplayBuffer(int BufferLen);
+int LoadDisplayBuffer(int BufferLen, bool bIsScrolling);
 void sendNTPpacket(IPAddress& address);
 
 void LoadDisplayBMP280(void);
@@ -116,7 +116,7 @@ void setup(void) {
       Serial.println(WiFi.localIP());
       break;
     }
-    LoadDisplayBuffer(LoadPos);
+    LoadDisplayBuffer(LoadPos, true);
     delay(50);
   }
 
@@ -159,7 +159,7 @@ int BufferEnd = 0;
 void loop(void) {
 	UpdateTime();
 
-  if (LoadDisplayBuffer(BufferEnd) == 0) {
+  if (LoadDisplayBuffer(BufferEnd, true) == 0) {
     if (LogoOn())
     {
       // LogoCount++;

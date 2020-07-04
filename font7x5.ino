@@ -879,7 +879,7 @@ void ResetScrollPos(void)
 	ScrollPos = 0;
 }
 
-int LoadDisplayBuffer(int BufferLen)
+int LoadDisplayBuffer(int BufferLen, bool bIsScrolling = true)
 {
 	unsigned char mask = 0x01;
 
@@ -906,8 +906,12 @@ int LoadDisplayBuffer(int BufferLen)
 		mask <<= 1;
 		lc.setRow(row, RowBuffer);
 	}
-	// ScrollPos++;
-	// if (ScrollPos >= BufferLen) ScrollPos = 0;
-
+	
+	if (bIsScrolling)
+	{
+		ScrollPos++;
+		if (ScrollPos >= BufferLen) ScrollPos = 0;
+	}
+	
 	return ScrollPos;
 }
