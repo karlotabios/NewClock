@@ -51,8 +51,8 @@ const int SPI_CS = 15;
 const int SPI_MOSI = 13;
 const int SPI_CLK = 14;
 
-char scrollText[] = "00:00am\0";
-//                   01234567
+char scrollText[] = "00:00\0";
+//                   012345
 
 // char scrollText[] = "00:00:00am \0";
 // //                   01234567890
@@ -242,16 +242,16 @@ void UpdateTime(void)
   // scrollText[6] = '0' + sec10;
   // scrollText[7] = '0' + sec - (sec10 * 10);
 
-  if (isAM(tm))
-  {
-    scrollText[5] = 'a';
-    scrollText[6] = 'm';
-  }
-  else
-  {
-    scrollText[5] = 'p';
-    scrollText[6] = 'm';
-  }
+  // if (isAM(tm))
+  // {
+  //   scrollText[5] = 'a';
+  //   scrollText[6] = 'm';
+  // }
+  // else
+  // {
+  //   scrollText[5] = 'p';
+  //   scrollText[6] = 'm';
+  // }
 }
 
 const int timeZone = 8 * SECS_PER_HOUR;     // PHT
