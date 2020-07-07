@@ -219,6 +219,9 @@ String GetDateStr(void)
   return DateStr;
 }
 
+bool bHasSecondPassed = false;
+int passedSecond = 0;
+
 void UpdateTime(void)
 {
   time_t tm = now();
@@ -239,6 +242,21 @@ void UpdateTime(void)
   int min10 = min / 10;
   scrollText[3] = '0' + min10;
   scrollText[4] = '0' + min - (min10 * 10);
+
+  int sec = second(tm);
+
+  if (sec != passedSecond) bHasSecondPassed = !bHasSecondPassed;
+
+  passedSecond = sec;
+
+  if (bHasSecondPassed)
+  {
+    scrollText[2] = '.';
+  }
+  else
+  {
+    scrollText[2] = ':';
+  }
 
   // int sec = second(tm);
   // int sec10 = sec / 10;
