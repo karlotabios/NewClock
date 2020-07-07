@@ -69,7 +69,7 @@ void wlanPageHandler()
 
 		String ReConnectStr("Reconnecting... ");
 		ResetScrollPos();
-		int Len = LoadMessage(ReConnectStr.c_str());
+		int Len = LoadMessage(ReConnectStr.c_str(), true);
 
 		for (int i = 0; i<200; i++)
 		{

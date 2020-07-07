@@ -808,19 +808,24 @@ void InitMax7219()
 }
 
 const int ColumnBufferLen = 512;
+unsigned char ColumnBufferScrolling[ColumnBufferLen];
 unsigned char ColumnBuffer[ColumnBufferLen];
+int LoadPosScrolling = 0;
 int LoadPos = 0;
+
 
 void ResetColumnBuffer()
 {
 	for (int col = 0; col < ColumnBufferLen; col++)
 	{
+		ColumnBufferScrolling[col] = 0;
 		ColumnBuffer[col] = 0;
 	}
+	LoadPosScrolling = 0;
 	LoadPos = 0;
 }
 
-char LoadColumnBuffer(char ascii)
+char LoadColumnBuffer(char ascii, bool useScrollingBuffer)
 {
 	char kern = 0;
 	if (ascii >= 0x20 && ascii <= 0x7f)
@@ -834,42 +839,58 @@ char LoadColumnBuffer(char ascii)
 #endif
 
 #if defined(ESP8266)
-		if ((LoadPos + kern) > ColumnBufferLen) kern = ColumnBufferLen - LoadPos;
-		memcpy_P(&ColumnBuffer[LoadPos], font7x5 + offset, kern);
+		if ((LoadPosScrolling + kern) > ColumnBufferLen) kern = ColumnBufferLen - LoadPosScrolling;
+		memcpy_P(&ColumnBufferScrolling[LoadPosScrolling], font7x5 + offset, kern);
 #else
 		for (int i = 0; i < kern; i++)
 		{
-			if (LoadPos >= ColumnBufferLen) return i;
-			ColumnBuffer[LoadPos++] = pgm_read_byte_near(font7x5 + offset);
+			if (LoadPosScrolling >= ColumnBufferLen) return i;
+			if (useScrollingBuffer)
+			{
+				ColumnBufferScrolling[LoadPosScrolling++] = pgm_read_byte_near(font7x5 + offset);
+			}
+			else
+			{
+				ColumnBuffer[LoadPos++] = pgm_read_byte_near(font7x5 + offset);
+			}
+			
 			offset++;
 		}
 #endif
-		LoadPos += kern;
+		if (useScrollingBuffer)
+		{
+			LoadPosScrolling += kern;
+		}
+		else
+		{
+			LoadPos += kern;
+		}
+		
 	}
 	return kern;
 }
 
-int ReloadMessage(int Pos, const char *message) 
+int ReloadMessage(int Pos, const char *message, bool bIsScrolling) 
 {
-	LoadPos = Pos;
+	LoadPosScrolling = Pos;
 	for (int counter = 0; ; counter++)
 	{
 		// read back a char 
 		unsigned char myChar = message[counter];
 		if (myChar != 0)
 		{
-			LoadColumnBuffer(myChar);
+			LoadColumnBuffer(myChar, bIsScrolling);
 		}
 		else break;
 	}
-	return LoadPos;
+	return LoadPosScrolling;
 }
 
-int LoadMessage(const char *message)
+int LoadMessage(const char *message, bool bIsScrolling)
 {
 	ResetColumnBuffer();
 
-	return ReloadMessage(LoadPos, message);
+	return ReloadMessage(LoadPosScrolling, message, bIsScrolling);
 }
 
 int ScrollPos;
@@ -886,7 +907,8 @@ int LoadDisplayBuffer(int BufferLen)
 	for (int row = 0; row < 8; row++)
 	{
 		unsigned char RowBuffer[numDevices];
-		int Pos = ScrollPos;
+		int tempScrollPos = ScrollPos;
+		int tempPos = 0;
 		unsigned char dat = 0;
 
 		for (int device = numDevices - 1; device >= 0; device--)
@@ -895,19 +917,31 @@ int LoadDisplayBuffer(int BufferLen)
 			for (int col = 0; col < 8; col++)
 			{
 				dat <<= 1;
-				if (Pos >= BufferLen) Pos = 0;
-				if (mask & ColumnBuffer[Pos++])
+				if (tempScrollPos >= BufferLen) tempScrollPos = 0;
+				if (tempPos >= BufferLen) tempPos = 0;
+				if (device >= numDevicesSequential)
 				{
-					dat += 1;
+					if (mask & ColumnBuffer[tempPos++])
+					{
+						dat += 1;
+					}
 				}
+				else
+				{
+					if (mask & ColumnBufferScrolling[tempScrollPos++])
+					{
+						dat += 1;
+					}
+				}
+				
 				RowBuffer[device] = dat;
 			}
 		}
 		mask <<= 1;
 		lc.setRow(row, RowBuffer);
 	}
-	// ScrollPos++;
-	// if (ScrollPos >= BufferLen) ScrollPos = 0;
+	ScrollPos++;
+	if (ScrollPos >= BufferLen) ScrollPos = 0;
 
 	return ScrollPos;
 }

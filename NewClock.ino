@@ -47,6 +47,7 @@ const char *ap_password = "bst142857";
 ///////////////////////////////////////////////////////////////////
 
 const int numDevices = 8;      // number of MAX7219s used
+const int numDevicesSequential = 4;  // number of MAX7219s that are packaged together or are in a row
 const int SPI_CS = 15;
 const int SPI_MOSI = 13;
 const int SPI_CLK = 14;
@@ -61,7 +62,7 @@ extern int LoadPos;
 
 void InitMax7219();
 void UpdateTime(void);
-int LoadMessage(const char *message);
+int LoadMessage(const char *message, bool bIsScrolling);
 void ResetScrollPos(void);
 int LoadDisplayBuffer(int BufferLen);
 void sendNTPpacket(IPAddress& address);
@@ -106,7 +107,7 @@ void setup(void) {
   String ConnectStr("Connecting... ");
 
   ResetScrollPos();
-  int Len = LoadMessage(ConnectStr.c_str());
+  int Len = LoadMessage(ConnectStr.c_str(), true);
   for (int i=0; i<200; i++)
   {
     if (WiFi.status() == WL_CONNECTED)
@@ -165,28 +166,28 @@ void loop(void) {
   if (LoadDisplayBuffer(BufferEnd) == 0) {
     if (LogoOn())
     {
-      // LogoCount++;
+      LogoCount++;
       if (LogoCount > 5) {
         LogoCount = 0;
         SetLogo(false);
-        String Timestr(scrollText);
-        Timestr += GetDateStr();
-        BufferEnd = LoadMessage(Timestr.c_str());
+        String Messagestr;
+        Messagestr = GetDateStr() + " ";
+        BufferEnd = LoadMessage(Messagestr.c_str(), true);
       } else
       if (LogoCount == 3) {
         SetLogo(false);
         LoadDisplayBMP280();
-        String Timestr(scrollText);
-        Timestr += bmp280_str;
-        BufferEnd = LoadMessage(Timestr.c_str());
+        String Messagestr;
+        Messagestr = bmp280_str + " ";
+        BufferEnd = LoadMessage(Messagestr.c_str(), true);
       } else {
-        BufferEnd = LoadMessage(scrollText);
+        BufferEnd = LoadMessage(scrollText, false);
       }
     }
     else
     {
       SetLogo(true);
-      BufferEnd = LoadMessage(scrollText);
+      // BufferEnd = LoadMessage(scrollText, true);
     }
   } else  {
     
@@ -201,7 +202,7 @@ void loop(void) {
       Pressure += bme.readPressure();
     }
 
-    ReloadMessage(0, scrollText);
+    // ReloadMessage(0, scrollText, true);
   }
  
 
