@@ -889,7 +889,7 @@ int LoadDisplayBuffer(int BufferLen)
 		int Pos = ScrollPos;
 		unsigned char dat = 0;
 
-		for (int device = numDevices - 1; device >= 0; device--)
+		for (int device = numDevices - 1; device >= numDevicesSequential; device--)
 		{
 			unsigned char dat = 0;
 			for (int col = 0; col < 8; col++)
@@ -903,11 +903,27 @@ int LoadDisplayBuffer(int BufferLen)
 				RowBuffer[device] = dat;
 			}
 		}
+
+		for (int device = numDevicesSequential - 1; device >= 0; device--)
+		{
+			unsigned char dat = 0;
+			for (int col = 0; col < 8; col++)
+			{
+				dat <<= 1;
+				if (Pos >= BufferLen) Pos = 0;
+				if (mask & ColumnBuffer[Pos++])
+				{
+					dat += 1;
+				}
+				RowBuffer[device] = dat;
+			}
+		}
+
 		mask <<= 1;
 		lc.setRow(row, RowBuffer);
 	}
-	// ScrollPos++;
-	// if (ScrollPos >= BufferLen) ScrollPos = 0;
+	ScrollPos++;
+	if (ScrollPos >= BufferLen) ScrollPos = 0;
 
 	return ScrollPos;
 }
