@@ -58,7 +58,8 @@ char scrollText[] = "00:00am\0";
 // char scrollText[] = "00:00:00am \0";
 // //                   01234567890
 
-extern int LoadPos;
+extern int LoadPosScrolling;
+extern int LoadPosStatic;
 
 void InitMax7219();
 void UpdateTime(void);
@@ -117,7 +118,7 @@ void setup(void) {
       Serial.println(WiFi.localIP());
       break;
     }
-    LoadDisplayBuffer(LoadPos);
+    LoadDisplayBuffer(LoadPosScrolling);
     delay(50);
   }
 

@@ -158,7 +158,7 @@ inline void SetLogo(boolean OnLogo)
 
 int DisplayLogo()
 {
-	return LoadDisplayBuffer(LoadPos);
+	return LoadDisplayBuffer(LoadPosScrolling);
 }
 
 /*///////////////////////////////////////////////////////////////////////////*/

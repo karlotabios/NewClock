@@ -808,16 +808,20 @@ void InitMax7219()
 }
 
 const int ColumnBufferLen = 512;
-unsigned char ColumnBuffer[ColumnBufferLen];
-int LoadPos = 0;
+unsigned char ColumnBufferScrolling[ColumnBufferLen];
+unsigned char ColumnBufferStatic[ColumnBufferLen];
+int LoadPosScrolling = 0;
+int LoadPosStatic = 0;
 
 void ResetColumnBuffer()
 {
 	for (int col = 0; col < ColumnBufferLen; col++)
 	{
-		ColumnBuffer[col] = 0;
+		ColumnBufferScrolling[col] = 0;
+		ColumnBufferStatic[col] = 0;
 	}
-	LoadPos = 0;
+	LoadPosScrolling = 0;
+	LoadPosStatic = 0;
 }
 
 char LoadColumnBuffer(char ascii)
@@ -834,24 +838,24 @@ char LoadColumnBuffer(char ascii)
 #endif
 
 #if defined(ESP8266)
-		if ((LoadPos + kern) > ColumnBufferLen) kern = ColumnBufferLen - LoadPos;
-		memcpy_P(&ColumnBuffer[LoadPos], font7x5 + offset, kern);
+		if ((LoadPosScrolling + kern) > ColumnBufferLen) kern = ColumnBufferLen - LoadPosScrolling;
+		memcpy_P(&ColumnBufferScrolling[LoadPosScrolling], font7x5 + offset, kern);
 #else
 		for (int i = 0; i < kern; i++)
 		{
-			if (LoadPos >= ColumnBufferLen) return i;
-			ColumnBuffer[LoadPos++] = pgm_read_byte_near(font7x5 + offset);
+			if (LoadPosScrolling >= ColumnBufferLen) return i;
+			ColumnBufferScrolling[LoadPosScrolling++] = pgm_read_byte_near(font7x5 + offset);
 			offset++;
 		}
 #endif
-		LoadPos += kern;
+		LoadPosScrolling += kern;
 	}
 	return kern;
 }
 
 int ReloadMessage(int Pos, const char *message) 
 {
-	LoadPos = Pos;
+	LoadPosScrolling = Pos;
 	for (int counter = 0; ; counter++)
 	{
 		// read back a char 
@@ -862,14 +866,14 @@ int ReloadMessage(int Pos, const char *message)
 		}
 		else break;
 	}
-	return LoadPos;
+	return LoadPosScrolling;
 }
 
 int LoadMessage(const char *message)
 {
 	ResetColumnBuffer();
 
-	return ReloadMessage(LoadPos, message);
+	return ReloadMessage(LoadPosScrolling, message);
 }
 
 int ScrollPos;
@@ -896,7 +900,7 @@ int LoadDisplayBuffer(int BufferLen)
 			{
 				dat <<= 1;
 				if (tempPos >= BufferLen) tempPos = 0;
-				if (mask & ColumnBuffer[tempPos++])
+				if (mask & ColumnBufferScrolling[tempPos++])
 				{
 					dat += 1;
 				}
@@ -911,7 +915,7 @@ int LoadDisplayBuffer(int BufferLen)
 			{
 				dat <<= 1;
 				if (Pos >= BufferLen) Pos = 0;
-				if (mask & ColumnBuffer[Pos++])
+				if (mask & ColumnBufferScrolling[Pos++])
 				{
 					dat += 1;
 				}
