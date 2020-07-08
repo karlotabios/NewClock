@@ -838,7 +838,10 @@ char LoadColumnBuffer(char ascii)
 #endif
 
 #if defined(ESP8266)
-		if ((LoadPosScrolling + kern) > ColumnBufferLen) kern = ColumnBufferLen - LoadPosScrolling;
+		if ((LoadPosScrolling + kern) > ColumnBufferLen)
+		{
+			kern = ColumnBufferLen - LoadPosScrolling;
+		}
 		memcpy_P(&ColumnBufferScrolling[LoadPosScrolling], font7x5 + offset, kern);
 #else
 		for (int i = 0; i < kern; i++)

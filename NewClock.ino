@@ -52,7 +52,7 @@ const int SPI_CS = 15;
 const int SPI_MOSI = 13;
 const int SPI_CLK = 14;
 
-char scrollText[] = "00:00am\0";
+char scrollText[] = "00:00am \0";
 //                   01234567
 
 // char scrollText[] = "00:00:00am \0";
@@ -231,7 +231,7 @@ void UpdateTime(void)
   int hour = hourFormat12(tm);
   if (hour < 10)
   {
-    scrollText[0] = '0';
+    scrollText[0] = ' ';
     scrollText[1] = '0' + hour;
   }
   else
