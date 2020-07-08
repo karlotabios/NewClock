@@ -887,6 +887,7 @@ int LoadDisplayBuffer(int BufferLen)
 	{
 		unsigned char RowBuffer[numDevices];
 		int Pos = ScrollPos;
+		int tempPos = 0;
 		
 		for (int device = numDevices - 1; device >= numDevicesSequential; device--)
 		{
@@ -894,8 +895,8 @@ int LoadDisplayBuffer(int BufferLen)
 			for (int col = 0; col < 8; col++)
 			{
 				dat <<= 1;
-				if (Pos >= BufferLen) Pos = 0;
-				if (mask & ColumnBuffer[Pos++])
+				if (tempPos >= BufferLen) tempPos = 0;
+				if (mask & ColumnBuffer[tempPos++])
 				{
 					dat += 1;
 				}
