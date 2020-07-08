@@ -63,7 +63,8 @@ extern int LoadPosStatic;
 
 void InitMax7219();
 void UpdateTime(void);
-int LoadMessage(const char *message);
+int LoadMessage(const char *message, bool useScrolling);
+int ReloadMessage(int Pos, const char *message, bool useScrolling); 
 void ResetScrollPos(void);
 int LoadDisplayBuffer(int BufferLen);
 void sendNTPpacket(IPAddress& address);
@@ -108,7 +109,7 @@ void setup(void) {
   String ConnectStr("Connecting... ");
 
   ResetScrollPos();
-  int Len = LoadMessage(ConnectStr.c_str());
+  int Len = LoadMessage(ConnectStr.c_str(), true);
   for (int i=0; i<200; i++)
   {
     if (WiFi.status() == WL_CONNECTED)
@@ -167,28 +168,26 @@ void loop(void) {
   if (LoadDisplayBuffer(BufferEnd) == 0) {
     if (LogoOn())
     {
-      // LogoCount++;
+      LogoCount++;
       if (LogoCount > 5) {
         LogoCount = 0;
         SetLogo(false);
-        String Timestr(scrollText);
-        Timestr += GetDateStr();
-        BufferEnd = LoadMessage(Timestr.c_str());
+        String Timestr(GetDateStr() + " ");
+        BufferEnd = LoadMessage(Timestr.c_str(), true);
       } else
       if (LogoCount == 3) {
         SetLogo(false);
         LoadDisplayBMP280();
-        String Timestr(scrollText);
-        Timestr += bmp280_str;
-        BufferEnd = LoadMessage(Timestr.c_str());
+        String Timestr(bmp280_str + " ");
+        BufferEnd = LoadMessage(Timestr.c_str(), true);
       } else {
-        BufferEnd = LoadMessage(scrollText);
+        BufferEnd = LoadMessage(scrollText, false);
       }
     }
     else
     {
       SetLogo(true);
-      BufferEnd = LoadMessage(scrollText);
+      BufferEnd = LoadMessage(scrollText, false);
     }
   } else  {
     
@@ -203,7 +202,7 @@ void loop(void) {
       Pressure += bme.readPressure();
     }
 
-    ReloadMessage(0, scrollText);
+    ReloadMessage(0, scrollText, true);
   }
  
 

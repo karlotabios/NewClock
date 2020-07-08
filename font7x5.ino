@@ -824,7 +824,7 @@ void ResetColumnBuffer()
 	LoadPosStatic = 0;
 }
 
-char LoadColumnBuffer(char ascii)
+char LoadColumnBuffer(char ascii, bool useScrolling)
 {
 	char kern = 0;
 	if (ascii >= 0x20 && ascii <= 0x7f)
@@ -842,21 +842,39 @@ char LoadColumnBuffer(char ascii)
 		{
 			kern = ColumnBufferLen - LoadPosScrolling;
 		}
-		memcpy_P(&ColumnBufferScrolling[LoadPosScrolling], font7x5 + offset, kern);
+		if (useScrolling)
+		{
+			memcpy_P(&ColumnBufferScrolling[LoadPosScrolling], font7x5 + offset, kern);
+		}
+		else
+		{
+			memcpy_P(&ColumnBufferStatic[LoadPosStatic], font7x5 + offset, kern);
+		}
+		
 #else
 		for (int i = 0; i < kern; i++)
 		{
 			if (LoadPosScrolling >= ColumnBufferLen) return i;
-			ColumnBufferScrolling[LoadPosScrolling++] = pgm_read_byte_near(font7x5 + offset);
+			if (LoadPosStatic >= ColumnBufferLen) return i;
+			if (useScrolling)
+			{
+				ColumnBufferScrolling[LoadPosScrolling++] = pgm_read_byte_near(font7x5 + offset);
+			}
+			else
+			{
+				ColumnBufferStatic[LoadPosStatic++] = pgm_read_byte_near(font7x5 + offset);
+			}
+			
 			offset++;
 		}
 #endif
 		LoadPosScrolling += kern;
+		LoadPosStatic += kern;
 	}
 	return kern;
 }
 
-int ReloadMessage(int Pos, const char *message) 
+int ReloadMessage(int Pos, const char *message, bool useScrolling = true) 
 {
 	LoadPosScrolling = Pos;
 	for (int counter = 0; ; counter++)
@@ -865,18 +883,18 @@ int ReloadMessage(int Pos, const char *message)
 		unsigned char myChar = message[counter];
 		if (myChar != 0)
 		{
-			LoadColumnBuffer(myChar);
+			LoadColumnBuffer(myChar, useScrolling);
 		}
 		else break;
 	}
 	return LoadPosScrolling;
 }
 
-int LoadMessage(const char *message)
+int LoadMessage(const char *message, bool useScrolling = true)
 {
 	ResetColumnBuffer();
 
-	return ReloadMessage(LoadPosScrolling, message);
+	return ReloadMessage(LoadPosScrolling, message, useScrolling);
 }
 
 int ScrollPos;
