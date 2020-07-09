@@ -843,15 +843,19 @@ char LoadColumnBuffer(char ascii)
 			kern = ColumnBufferLen - LoadPosScrolling;
 		}
 		memcpy_P(&ColumnBufferScrolling[LoadPosScrolling], font7x5 + offset, kern);
+		memcpy_P(&ColumnBufferStatic[LoadPosStatic], font7x5 + offset, kern);
 #else
 		for (int i = 0; i < kern; i++)
 		{
 			if (LoadPosScrolling >= ColumnBufferLen) return i;
+			if (LoadPosStatic >= ColumnBufferLen) return i;
 			ColumnBufferScrolling[LoadPosScrolling++] = pgm_read_byte_near(font7x5 + offset);
+			ColumnBufferStatic[LoadPosStatic++] = pgm_read_byte_near(font7x5 + offset);
 			offset++;
 		}
 #endif
 		LoadPosScrolling += kern;
+		LoadPosStatic += kern;
 	}
 	return kern;
 }
